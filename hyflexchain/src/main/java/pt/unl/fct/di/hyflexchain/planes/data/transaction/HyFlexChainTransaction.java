@@ -78,6 +78,20 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 	 * Optional field to include arbitrary data
 	 */
 	protected byte[] data;
+	
+	/**
+	 * The type of zero-knowledge proof used in this transaction
+	 */
+	protected ZeroKnowledgeProofType zkpType;
+
+	/**
+	 * The zero-knowledge proof data
+	 * I need to check if we can just send the json proof or if we also need to check with proving keys and all of that, which might be necessary
+	 */
+	
+	protected byte[] zkpProofData;
+
+
 
 	/**
 	 * @param sender
