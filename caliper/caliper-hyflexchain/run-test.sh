@@ -5,6 +5,8 @@ results_folder=$2
 
 mkdir -p $results_folder
 
+# CALIPER_BENCHCONFIG=config/benchmark_private.yaml # to activate on private transactions
+
 docker run --rm -d --network host \
     -v "$(pwd)/config:/hyperledger/caliper/workspace/config" \
     -v "$(pwd)/crypto:/hyperledger/caliper/workspace/crypto" \

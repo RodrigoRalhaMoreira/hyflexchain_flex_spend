@@ -18,6 +18,7 @@ COPY --chown=node:node lib ./lib
 COPY --chown=node:node launch-master.sh ./
 
 ENV CALIPER_BENCHCONFIG=config/benchmark.yaml
+# ENV CALIPER_BENCHCONFIG=config/benchmark_private.yaml # to activate on private transactions
 ENV CALIPER_NETWORKCONFIG=config/networkconfig.json
 
 USER root
