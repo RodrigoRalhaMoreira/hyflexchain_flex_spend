@@ -186,7 +186,13 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
     }
 
 	public boolean verifySignature() throws InvalidAddressException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
-    {
+    {	
+		// check if it is a private transaction
+		if (this.zkpType != null){
+			// verify zero knowledge proof
+			return verifyZeroKnowledgeProof();
+		}
+	
         var key = this.sender.readPublicKey();
 		var sigAlg = this.signatureType;
 		return verifySignature(key, sigAlg);
@@ -199,6 +205,12 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 		update(signature);
 
 		return signature.verify(this.signature);
+    }
+
+	public boolean verifyZeroKnowledgeProof()
+    {
+		// interact with the zero knowledge proof plane
+		return true;
     }
 
 	public Address[] recipientAddresses()
