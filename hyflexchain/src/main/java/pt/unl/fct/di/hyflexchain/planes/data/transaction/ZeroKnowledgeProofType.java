@@ -16,7 +16,7 @@ public enum ZeroKnowledgeProofType implements BytesOps {
 	/**
 	 * Regular transactions: a transaction that transfers assets/tokens.
 	 */
-	ZKSNARKS_GROTH_16 ((byte) 1);
+	ZKSNARKS_ZOKRATES_GROTH_16 ((byte) 1);
 
 
 	public static final Serializer SERIALIZER = new Serializer();

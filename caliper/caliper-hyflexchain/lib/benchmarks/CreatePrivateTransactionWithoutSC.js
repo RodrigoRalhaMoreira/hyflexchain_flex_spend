@@ -45,7 +45,7 @@ class CreateTransactionWithoutScWorkload extends WorkloadModuleBase {
 
         const inputTxs = [HyFlexChainPrivateTransaction.createInputTx(this.getRandDestAddress(), "some hash", 0)];
         const outputTxs = [HyFlexChainPrivateTransaction.createOutputTx(destAddress, val)];
-        const zkpProofData = [Buffer.from([1, 2, 3])];
+        const zkpProofData = getZkpProofData();
         const tx = new HyFlexChainPrivateTransaction(HyFlexChainPrivateTransaction.TRANSFER, originPubKey, inputTxs, outputTxs, zkpProofData);
         tx.nonce = this.txIndex;
 
@@ -70,6 +70,7 @@ class CreateTransactionWithoutScWorkload extends WorkloadModuleBase {
      * @return {Promise<Buffer[]>}
      */
     async getZkpProofData() {
+        // TODO: Implement the actual logic to get ZKP proof data
         const proofJsonData = await fs.readFile('proof.json', 'utf8');
         const proof = JSON.parse(proofJsonData);
         const provingKey = await fs.readFile('proving.key');
