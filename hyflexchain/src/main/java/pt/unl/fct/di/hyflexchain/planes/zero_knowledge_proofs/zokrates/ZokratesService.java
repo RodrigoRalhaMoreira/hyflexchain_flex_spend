@@ -89,34 +89,44 @@ public class ZokratesService {
         }
     }
 
-    public void verifyProof(JSONObject proof) {
-        if (proof == null) {
-            throw new IllegalArgumentException("Proof cannot be null.");
+    public void verifyProof(JSONObject proof, JSONObject provingKey) {
+        // check the type of the provingKey 
+        if (proof == null || provingKey == null) {
+            throw new IllegalArgumentException("Proof and provingKey cannot be null.");
         }
-
-        // create unique paths for each proof afterwards, using some other attribute or hashing the proof
-        
+    
         File proofFile = new File("proof.json");
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(proofFile))) {
-            // Write the proof to the file
-            writer.write(proof.toString());
-
-            // Copy the proof file to the Docker container
-            String[] copyCommand = {"docker", "cp", "proof.json", "zokrates_container:/home/zokrates/"};
-            executeDockerCommand(copyCommand);
-
+        File provingKeyFile = new File("proving.key");
+        try (BufferedWriter proofWriter = new BufferedWriter(new FileWriter(proofFile));
+             BufferedWriter provingKeyWriter = new BufferedWriter(new FileWriter(provingKeyFile))) {
+            // Write the proof to its file
+            proofWriter.write(proof.toString());
+            // Write the proving key to its file
+            provingKeyWriter.write(provingKey.toString());
+    
+            // Copy both files to the Docker container
+            String[] copyProofCommand = {"docker", "cp", "proof.json", "zokrates_container:/home/zokrates/"};
+            String[] copyProvingKeyCommand = {"docker", "cp", "proving.key", "zokrates_container:/home/zokrates/"};
+            executeDockerCommand(copyProofCommand);
+            executeDockerCommand(copyProvingKeyCommand);
+    
             // Execute the verify command inside the Docker container
-            String[] verifyCommand = {"docker", "exec", "zokrates_container", "/bin/bash", "-c", "cd /home/zokrates && zokrates verify"};
+            // Assuming the verification process requires both the proof and the proving key
+            String verifyCmd = "cd /home/zokrates && zokrates verify -p proof.json -v proving.key";
+            String[] verifyCommand = {"docker", "exec", "zokrates_container", "/bin/bash", "-c", verifyCmd};
             executeDockerCommand(verifyCommand);
-
-            // Delete the proof file from the Docker container
-            String[] deleteCommand = {"docker", "exec", "zokrates_container", "/bin/bash", "-c", "rm /home/zokrates/proof.json"};
-            executeDockerCommand(deleteCommand);
+    
+            // Delete the files from the Docker container
+            String[] deleteProofCommand = {"docker", "exec", "zokrates_container", "/bin/bash", "-c", "rm /home/zokrates/proof.json"};
+            String[] deleteProvingKeyCommand = {"docker", "exec", "zokrates_container", "/bin/bash", "-c", "rm /home/zokrates/proving.key"};
+            executeDockerCommand(deleteProofCommand);
+            executeDockerCommand(deleteProvingKeyCommand);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         } finally {
-            // Delete the proof file from the host machine
+            // Delete the files from the host machine
             proofFile.delete();
+            provingKeyFile.delete();
         }
     }
 

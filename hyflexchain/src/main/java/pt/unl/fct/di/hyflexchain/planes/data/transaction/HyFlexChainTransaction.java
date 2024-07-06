@@ -11,6 +11,7 @@ import java.security.SignatureException;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import pt.unl.fct.di.hyflexchain.planes.zero_knowledge_proofs.ZeroKnowledgeProofsInterface;
 import pt.unl.fct.di.hyflexchain.util.BytesOps;
 import pt.unl.fct.di.hyflexchain.util.Utils;
 import pt.unl.fct.di.hyflexchain.util.crypto.Crypto;
@@ -189,7 +190,6 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
     {	
 		// check if it is a private transaction
 		if (this.zkpType != null){
-			// verify zero knowledge proof
 			return verifyZeroKnowledgeProof();
 		}
 	
@@ -209,7 +209,9 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 
 	public boolean verifyZeroKnowledgeProof()
     {
-		// interact with the zero knowledge proof plane
+		// get the zero knowledge proof instance
+		ZeroKnowledgeProofsInterface zkp = ZeroKnowledgeProofsInterface.getInstance(this.zkpType);
+		zkp.verifyProof(this.zkpProofData);
 		return true;
     }
 

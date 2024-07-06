@@ -39,6 +39,7 @@ class CreateTransactionWithoutScWorkload extends WorkloadModuleBase {
      * @return {Promise<TxStatus[]>}
      */
     async submitTransaction() {
+        // use the keyPair to get the public and private transactions neeeded for zkproof generation
         const originPubKey = "0x01" + this.sutContext.encodedPublicKey;
         const destAddress = this.getRandDestAddress();
         const val = Util.getRandomInt32();
@@ -74,7 +75,6 @@ class CreateTransactionWithoutScWorkload extends WorkloadModuleBase {
         const proofJsonData = await fs.readFile('proof.json', 'utf8');
         const proof = JSON.parse(proofJsonData);
         const provingKey = await fs.readFile('proving.key');
-        const publicInputs = ['input1', 'input2']; // Example, replace with actual inputs
 
         // Construct zkpProofData based on the read and processed data
         // Adjust according to your actual data structure and requirements
