@@ -3,7 +3,7 @@ test:
     number: 1
   rounds:
 
-    - label: Install Smart Contracts 200 tps - PoW
+    - label: Testing - PoW
       description: Submit PoW transactions (sc piggybacked)
       txDuration: 60
       # txNumber: 5000
@@ -12,7 +12,7 @@ test:
         opts:
           tps: 200
       workload:
-        module: lib/benchmarks/InstallSmartContracts.js
+        module: lib/benchmarks/CreatePrivateTransactionWithoutSC.js
 
     # - label: Submit Transactions 100 tps - PoW
     #   description: Submit PoW transactions (sc piggybacked)

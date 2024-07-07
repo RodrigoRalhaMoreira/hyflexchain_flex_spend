@@ -42,6 +42,9 @@ class CreateTransactionWithoutScWorkload extends WorkloadModuleBase {
         // use the keyPair to get the public and private transactions neeeded for zkproof generation
         console.log(this.sutContext.keyPair);
         console.log("THIS IS A TEST")
+        console.log(this.sutContext.keyPair.getPublicKeyString());
+        console.log(this.sutContext.keyPair.getPrivateKeyString());
+        console.log("END TEST")
         const originPubKey = "0x01" + this.sutContext.encodedPublicKey;
         const destAddress = this.getRandDestAddress();
         const val = Util.getRandomInt32();
