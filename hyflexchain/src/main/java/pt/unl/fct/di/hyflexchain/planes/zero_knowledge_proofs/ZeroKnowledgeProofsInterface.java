@@ -23,7 +23,7 @@ public interface ZeroKnowledgeProofsInterface {
      * @param proof
      * @return True if the proof could be validated, False otherwise.
      */
-    public Boolean verifyProof(ProofVerificationRequest proof);
+    public boolean verifyProof(byte[] proof);
 
 
 }

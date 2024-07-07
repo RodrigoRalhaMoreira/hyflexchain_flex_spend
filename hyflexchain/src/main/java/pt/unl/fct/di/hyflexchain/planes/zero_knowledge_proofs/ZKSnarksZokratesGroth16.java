@@ -1,7 +1,5 @@
 package pt.unl.fct.di.hyflexchain.planes.zero_knowledge_proofs;
 
-import org.json.JSONObject;
-
 import pt.unl.fct.di.hyflexchain.planes.zero_knowledge_proofs.zokrates.ZokratesService
 ;
 public class ZKSnarksZokratesGroth16 implements ZeroKnowledgeProofsInterface {
@@ -18,9 +16,8 @@ public class ZKSnarksZokratesGroth16 implements ZeroKnowledgeProofsInterface {
     }
 
     @Override
-    public String verifyProof(JSONObject proof) {
-        zokratesService.verifyProof(proof);
-        return null;
+    public boolean verifyProof(byte[] proof) {
+        return zokratesService.verifyProof(proof);
     }
 
 }
