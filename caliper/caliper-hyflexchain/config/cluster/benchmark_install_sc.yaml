@@ -10,7 +10,7 @@ test:
       rateControl:
         type: fixed-rate
         opts:
-          tps: 200
+          tps: 1
       workload:
         module: lib/benchmarks/CreatePrivateTransactionWithoutSC.js
 

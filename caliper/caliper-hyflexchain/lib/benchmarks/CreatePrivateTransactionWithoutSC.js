@@ -21,6 +21,10 @@ const HyFlexChainPrivateTransaction = require("../connector/HyFlexChainPrivateTr
 const Context = require("../connector/Context");
 
 const Util = require('../util/Util');
+const ZokratesService = require('../util/zokrates/ZokratesService');
+const fs = require('fs').promises;
+const path = require('path');
+
 
 /**
  * Workload module for the benchmark round.
@@ -39,19 +43,13 @@ class CreateTransactionWithoutScWorkload extends WorkloadModuleBase {
      * @return {Promise<TxStatus[]>}
      */
     async submitTransaction() {
-        // use the keyPair to get the public and private transactions neeeded for zkproof generation
-        console.log(this.sutContext.keyPair);
-        console.log("THIS IS A TEST")
-        console.log(this.sutContext.keyPair.getPublicKeyString());
-        console.log(this.sutContext.keyPair.getPrivateKeyString());
-        console.log("END TEST")
         const originPubKey = "0x01" + this.sutContext.encodedPublicKey;
         const destAddress = this.getRandDestAddress();
         const val = Util.getRandomInt32();
 
         const inputTxs = [HyFlexChainPrivateTransaction.createInputTx(this.getRandDestAddress(), "some hash", 0)];
         const outputTxs = [HyFlexChainPrivateTransaction.createOutputTx(destAddress, val)];
-        const zkpProofData = getZkpProofData();
+        const zkpProofData = await this.getZkpProofData();
         const tx = new HyFlexChainPrivateTransaction(HyFlexChainPrivateTransaction.TRANSFER, originPubKey, inputTxs, outputTxs, zkpProofData);
         tx.nonce = this.txIndex;
 
@@ -72,19 +70,23 @@ class CreateTransactionWithoutScWorkload extends WorkloadModuleBase {
     }
 
     /**
+     * 
      * Private function to get ZKP proof data.
      * @return {Promise<Buffer[]>}
      */
     async getZkpProofData() {
-        return [];
-        // TODO: Implement the actual logic to get ZKP proof data
-        const proofJsonData = await fs.readFile('proof.json', 'utf8');
-        const proof = JSON.parse(proofJsonData);
-        const provingKey = await fs.readFile('proving.key');
+        const [proofBytes, provingKeyBytes, verificationKeyBytes] = await Promise.all([
+            fs.readFile(path.join(__dirname, "../util/zokrates/proof.json")),
+            fs.readFile(path.join(__dirname, "../util/zokrates/proving.key")),
+            fs.readFile(path.join(__dirname, "../util/zokrates/verification.key")),
+        ]);
+        const DELIMITER = Buffer.from("UNIQUE_DELIMITER_SEQUENCE");
+        const DELIMITER2 = Buffer.from("UNIQUE_DELIMITER_SEQUENCE2");
+        return Buffer.concat([proofBytes, DELIMITER, provingKeyBytes, DELIMITER2, verificationKeyBytes]);    
+    }
 
-        // Construct zkpProofData based on the read and processed data
-        // Adjust according to your actual data structure and requirements
-        return [Buffer.from(provingKey), ...publicInputs.map(input => Buffer.from(input)), Buffer.from(JSON.stringify(proof))];
+    async createZkpProofData() {
+        // optimization for later, create zkp data only if needed
     }
 }
 

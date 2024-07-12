@@ -311,8 +311,10 @@ class HyFlexChainConnector extends ConnectorBase {
         request.sign(this.context.getKeyPair().getPrivateKey(), this.cryptoUtils);
 
         const data = request.toJson();
-
-        // Logger.error(JSON.stringify(data));
+        
+        Logger.error(JSON.stringify(data));
+        Logger.error("-------------------------------------------")
+        Logger.error(data)
 
         let status = new TxStatus();
 

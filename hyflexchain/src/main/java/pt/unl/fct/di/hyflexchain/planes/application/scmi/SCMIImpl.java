@@ -68,7 +68,7 @@ public class SCMIImpl implements SmartContractManagementInterface {
             LOGGER.error(e.getMessage(), e);
             throw new Error(e.getMessage(), e);
         }
-
+        LOGGER.error("PRINT NUMBER 21");
         TransactionInterface.getInstance().sendTransactionAndWait(TxWrapper.from(tx));
 
         return tx.getSmartContract().id().toHexString();
@@ -88,6 +88,7 @@ public class SCMIImpl implements SmartContractManagementInterface {
             throw new Error(e.getMessage(), e);
         }
 
+        LOGGER.error("PRINT NUMBER 15");
         TransactionInterface.getInstance().sendTransactionAndWait(TxWrapper.from(tx));
 
         return contractAddress.toHexString();

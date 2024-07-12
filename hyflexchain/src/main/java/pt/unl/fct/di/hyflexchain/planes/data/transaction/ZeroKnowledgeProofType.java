@@ -16,24 +16,48 @@ public enum ZeroKnowledgeProofType implements BytesOps {
 	/**
 	 * Regular transactions: a transaction that transfers assets/tokens.
 	 */
-	ZKSNARKS_ZOKRATES_GROTH_16 ((byte) 1);
+	ZKSNARKS_ZOKRATES_GROTH_16("ZKSNARKS_ZOKRATES_GROTH_16", (byte) 1);
 
 
 	public static final Serializer SERIALIZER = new Serializer();
 
-	public final byte id;
+    private final String name;
+    private final byte zkpId;
 
 	/**
+     * @param name
 	 * @param id
 	 */
-	private ZeroKnowledgeProofType(byte id) {
-		this.id = id;
+	private ZeroKnowledgeProofType(String name, byte zkpId) {
+        this.name = name;
+		this.zkpId = zkpId;
 	}
+
+    /**
+     * The name of this zk mechanism.
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * The id of this zk mechanism.
+     * @return the zkpId
+     */
+    public byte getZkpId() {
+        return zkpId;
+    }
+
+    @Override
+    public String toString() {
+        return this.name;
+    }
 
 	public static Optional<ZeroKnowledgeProofType> decode(byte id)
     {
         return Stream.of(values())
-            .filter((alg) -> alg.id == id)
+            .filter((zkp) -> zkp.zkpId == id)
             .findAny();
     }
 
@@ -47,7 +71,7 @@ public enum ZeroKnowledgeProofType implements BytesOps {
     {
         @Override
         public void serialize(ZeroKnowledgeProofType t, ByteBuf out) throws IOException {
-            out.writeByte(t.id);
+            out.writeByte(t.zkpId);
         }
 
         @Override

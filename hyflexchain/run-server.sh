@@ -17,7 +17,7 @@ contact=replica-0:10000
 # address=$2
 # contact=$3:10000
 
-docker run --rm -d --name $replica_name -h $replica_name  \
+docker run --rm --name $replica_name -h $replica_name  \
 	--network $network_name -p $server_port:$server_port \
 	--cap-add NET_ADMIN \
 	-v "$(pwd)/hyflexchain-config:/app/hyflexchain-config" \

@@ -34,6 +34,7 @@ public class HyFlexChainTI_Resource implements TransactionInterfaceRest {
 	public String sendTransactionAndWait(HyFlexChainTransaction tx)
 	{
 		try {
+			LOG.error("PRINT NUMBER 1");
 			return hyflexchainInterface.getTi().sendTransactionAndWait(TxWrapper.from(tx));
 		} catch (InvalidTransactionException e) {
 			e.printStackTrace();

@@ -55,7 +55,8 @@ public class TransactionInterfaceV2_0 implements TransactionInterface {
 
 	@Override
 	public String sendTransactionAndWait(TxWrapper tx) throws InvalidTransactionException
-	{
+	{	
+		LOGGER.error("PRINT NUMBER 12");
 		verifyTx(tx.tx());
 		return TransactionManagement.getInstance().dispatchTransactionAndWait(tx);
 	}

@@ -5,11 +5,11 @@ test:
     - label: Submit 5000 Transactions 50 tps
       description: Test description for transfering money between accounts.
       # txDuration: 60
-      txNumber: 5000
+      txNumber: 10
       rateControl:
         type: fixed-rate
         opts:
-          tps: 50
+          tps: 1
       workload:
         module: lib/benchmarks/CreatePrivateTransactionWithoutSC.js
 

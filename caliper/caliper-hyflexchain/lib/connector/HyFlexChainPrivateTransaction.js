@@ -40,7 +40,7 @@ class HyFlexChainPrivateTransaction
 	
 	// ZKP transaction type
 
-	static ZKP_TRANSFER = ["ZKP_TRANSFER", Buffer.from([6])];
+	static ZKSNARKS_ZOKRATES_GROTH_16 = "ZKSNARKS_ZOKRATES_GROTH_16";
 	
 
 
@@ -66,27 +66,35 @@ class HyFlexChainPrivateTransaction
 		this.inputTxs = inputTxs;
 		this.outputTxs = outputTxs;
 		this.data = Buffer.alloc(1);
-		this.zkpType = HyFlexChainPrivateTransaction.ZKP_TRANSFER
+		this.zkpType = HyFlexChainPrivateTransaction.ZKSNARKS_ZOKRATES_GROTH_16
 		this.zkpProofData = zkpProofData;
 	}
 
-
-	toJson()
+	/**
+	 * Sign transaction
+	 * @param {crypto.KeyObject} privKey 
+	 * @param {CryptoUtils} cryptoUtils 
+	 */
+	sign(privKey, cryptoUtils)
 	{
+		// to understand if this can be done without signing because the proof should be enough
+	}
+
+	toJson() {
 		return {
-            version : this.version,
-            sender : {address : this.sender.address.toString("base64")},
-            signatureType : this.signatureType,
-            signature : null,
-            nonce : this.nonce,
-            transactionType : this.transactionType[0],
-            smartContract : HyFlexChainPrivateTransaction.toJsonSmartContract(this.smartContract),
-            inputTxs : this.inputTxs.map(v => HyFlexChainPrivateTransaction.toJsonInputTx(v)),
-            outputTxs : this.outputTxs.map(v => HyFlexChainPrivateTransaction.toJsonOutputTx(v)),
-            data : this.data.toString("base64"),
-			zkpType : this.zkpType[0],
-			zkpProofData : this.zkpProofData.toString("base64")
-        }
+			version: this.version,
+			sender: { address: this.sender.address.toString("base64") },
+			signatureType: this.signatureType,
+			signature: this.signature ? this.signature.toString("base64") : null,
+			nonce: this.nonce,
+			transactionType: Array.isArray(this.transactionType) ? this.transactionType.map(t => t.toString()) : this.transactionType.toString(),
+			smartContract: this.smartContract ? HyFlexChainPrivateTransaction.toJsonSmartContract(this.smartContract) : null,
+			inputTxs: this.inputTxs.map(v => HyFlexChainPrivateTransaction.toJsonInputTx(v)),
+			outputTxs: this.outputTxs.map(v => HyFlexChainPrivateTransaction.toJsonOutputTx(v)),
+			data: this.data.toString("base64"),
+			zkpType: this.zkpType,
+			zkpProofData: Array.isArray(this.zkpProofData) ? this.zkpProofData.map(data => data.toString("base64")) : this.zkpProofData.toString("base64")
+		};
 	}
 
 	static smartContract(ref, code)
