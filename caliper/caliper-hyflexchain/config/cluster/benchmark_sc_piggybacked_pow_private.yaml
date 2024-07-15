@@ -3,8 +3,8 @@ test:
     number: 1
   rounds:
 
-    - label: Submit Transactions 50 tps - PoW
-      description: Submit PoW transactions (sc piggybacked)
+    - label: Submit Private Transactions 50 tps - PoW
+      description: Submit Private PoW transactions (sc piggybacked)
       txDuration: 60
       # txNumber: 5000
       rateControl:

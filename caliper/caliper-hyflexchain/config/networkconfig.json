@@ -4,11 +4,11 @@
     },
     "hyflexchain": {
         "url": [
-            "https://localhost:18000/api/rest",
-            "https://localhost:18001/api/rest",
-            "https://localhost:18002/api/rest",
-            "https://localhost:18003/api/rest",
-            "https://localhost:18004/api/rest"
+            "https://0.0.0.0:18000/api/rest",
+            "https://0.0.0.0:18001/api/rest",
+            "https://0.0.0.0:18002/api/rest",
+            "https://0.0.0.0:18003/api/rest",
+            "https://0.0.0.0:18004/api/rest"
         ],
         "connection_timeout" : "800000",
         "truststore_ca" : "./crypto/hyflexchain_root_cert.pem",

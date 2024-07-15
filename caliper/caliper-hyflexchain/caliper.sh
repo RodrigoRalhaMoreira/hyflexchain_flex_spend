@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# docker build -t rrmoreira57943/flexspend:caliper .
+docker build -t rrmoreira57943/flexspend:caliper .
 
 docker run --rm -it --network host \
     -v "$(pwd)/config:/hyperledger/caliper/workspace/config" \

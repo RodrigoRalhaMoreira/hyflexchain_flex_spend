@@ -16,7 +16,7 @@
 
 const WorkloadModuleBase = require('@hyperledger/caliper-core').WorkloadModuleBase;
 
-const HyFlexChainPrivateTransaction = require("../connector/HyFlexChainPrivateTransaction");
+const HyFlexChainTransaction = require("../connector/HyFlexChainTransaction");
 
 const Context = require("../connector/Context");
 
@@ -52,11 +52,11 @@ class CreateTransactionPowWorkload extends WorkloadModuleBase {
             if (this.sutAdapter.hyflexchainConfig.reference_smart_contract)
             {
                 const ref = this.sutContext.installedContracts.get("pow");
-                this.smartContract = HyFlexChainPrivateTransaction.smartContractRef(ref);
+                this.smartContract = HyFlexChainTransaction.smartContractRef(ref);
             } else // pyggyback smart contract
             {
                 const contractData = this.sutAdapter.smart_contracts_map.get("pow");
-                this.smartContract = HyFlexChainPrivateTransaction.smartContractCode(contractData);
+                this.smartContract = HyFlexChainTransaction.smartContractCode(contractData);
             }
         }
 
@@ -64,10 +64,10 @@ class CreateTransactionPowWorkload extends WorkloadModuleBase {
         const destAddress = this.getRandDestAddress();
         const val = Util.getRandomInt32();
 
-        const inputTxs = [HyFlexChainPrivateTransaction.createInputTx(Buffer.from("some hash", "utf-8"), 0)];
-        const outputTxs = [HyFlexChainPrivateTransaction.createOutputTx(destAddress, val)];
+        const inputTxs = [HyFlexChainTransaction.createInputTx(Buffer.from("some hash", "utf-8"), 0)];
+        const outputTxs = [HyFlexChainTransaction.createOutputTx(destAddress, val)];
         const zkpProofData = await this.getZkpProofData();
-        const tx = new HyFlexChainPrivateTransaction(HyFlexChainPrivateTransaction.TRANSFER, originPubKey, inputTxs, outputTxs, zkpProofData);
+        const tx = new HyFlexChainTransaction(HyFlexChainTransaction.TRANSFER, originPubKey, inputTxs, outputTxs, HyFlexChainTransaction.ZKSNARKS_ZOKRATES_GROTH_16, zkpProofData);
         tx.nonce = this.txIndex;
         tx.smartContract = this.smartContract;
 
