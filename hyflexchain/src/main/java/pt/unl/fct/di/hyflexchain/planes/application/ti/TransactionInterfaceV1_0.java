@@ -20,7 +20,6 @@ public class TransactionInterfaceV1_0 implements TransactionInterface {
 	@Override
 	public void verifyTx(HyFlexChainTransaction tx) throws InvalidTransactionException
 	{	
-		LOGGER.error("ERROR1");
 		HyFlexChainTransaction.Version version;
 		try {
 			version = HyFlexChainTransaction.Version.valueOf(tx.getVersion());
@@ -49,7 +48,6 @@ public class TransactionInterfaceV1_0 implements TransactionInterface {
 	@Override
 	public String sendTransaction(TxWrapper tx) throws InvalidTransactionException
 	{	
-		LOGGER.error("ERROR2");
 		verifyTx(tx.tx());
 		return TransactionManagement.getInstance().dispatchTransaction(tx);	
 	}
@@ -57,7 +55,6 @@ public class TransactionInterfaceV1_0 implements TransactionInterface {
 	@Override
 	public String sendTransactionAndWait(TxWrapper tx) throws InvalidTransactionException
 	{	
-		LOGGER.error("ERROR6");
 		verifyTx(tx.tx());
 		return TransactionManagement.getInstance().dispatchTransactionAndWait(tx);
 	}

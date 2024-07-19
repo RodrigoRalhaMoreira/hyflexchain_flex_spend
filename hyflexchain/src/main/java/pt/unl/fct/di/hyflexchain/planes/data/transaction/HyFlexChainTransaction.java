@@ -66,6 +66,11 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 	protected TransactionType transactionType;
 
 	/**
+	 * The type of zero-knowledge proof used in this transaction
+	 */
+	protected ZeroKnowledgeProofType zkpType;
+
+	/**
 	 * A smart contract to create, revoke or execute.
 	 */
 	protected SmartContract smartContract;
@@ -84,11 +89,6 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 	 * Optional field to include arbitrary data
 	 */
 	protected byte[] data;
-	
-	/**
-	 * The type of zero-knowledge proof used in this transaction
-	 */
-	protected ZeroKnowledgeProofType zkpType;
 
 	/**
 	 * The zero-knowledge proof data
@@ -111,7 +111,7 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 			long nonce, TransactionType transactionType, SmartContract smartContract, TxInput[] inputTxs,
 			UTXO[] outputTxs, byte[] data) {
 		return new HyFlexChainTransaction(Version.V1_0.name(), sender, signatureType, signature,
-			nonce, transactionType, smartContract, inputTxs, outputTxs, data, null, new byte[0]);
+			nonce, transactionType, smartContract, inputTxs, outputTxs, data, ZeroKnowledgeProofType.NON_ZK, null);
 	}
 
 	/**
@@ -124,7 +124,7 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 	public static HyFlexChainTransaction createContract(Address sender, SignatureAlgorithm signatureType, byte[] signature,
 			long nonce, SmartContract smartContract) {
 		return new HyFlexChainTransaction(Version.V1_0.name(), sender, signatureType, signature,
-			nonce, TransactionType.CONTRACT_CREATE, smartContract, new TxInput[0], new UTXO[0], new byte[0], null, new byte[0]);
+			nonce, TransactionType.CONTRACT_CREATE, smartContract, new TxInput[0], new UTXO[0], new byte[0], ZeroKnowledgeProofType.NON_ZK, null);
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 	public static HyFlexChainTransaction revokeContract(Address sender, SignatureAlgorithm signatureType, byte[] signature,
 			long nonce, SmartContract smartContract) {
 		return new HyFlexChainTransaction(Version.V1_0.name(), sender, signatureType, signature,
-			nonce, TransactionType.CONTRACT_REVOKE, smartContract, new TxInput[0], new UTXO[0], new byte[0], null, new byte[0]);
+			nonce, TransactionType.CONTRACT_REVOKE, smartContract, new TxInput[0], new UTXO[0], new byte[0], ZeroKnowledgeProofType.NON_ZK, null);
 	}
 
 	/**
@@ -173,8 +173,8 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 		this.inputTxs = inputTxs;
 		this.outputTxs = outputTxs;
 		this.data = data;
-		this.zkpType = null;
-		this.zkpProofData = new byte[0];
+		this.zkpType = ZeroKnowledgeProofType.NON_ZK;
+		this.zkpProofData = null;
 	}
 
 	/**
@@ -221,18 +221,8 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 
 	public boolean verifySignature() throws InvalidAddressException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
     {	
-		LOGGER.info("VERIFYING SIGNATURE222222");
 		// check if it is a private transaction
-		LOGGER.info("Transaction zkpt: " + this.zkpType);
-		
-		if (this.zkpType != null){
-			LOGGER.info("Verifying zero knowledge proof");
-			LOGGER.info("SPAMMER ALERT2");
-			LOGGER.info("SPAMMER ALERT2");
-			LOGGER.info("SPAMMER ALERT2");
-			LOGGER.info("SPAMMER ALERT2");
-			LOGGER.info("SPAMMER ALERT2");
-			
+		if (this.zkpType != ZeroKnowledgeProofType.NON_ZK) {
 			return verifyZeroKnowledgeProof();
 		}
         var key = this.sender.readPublicKey();
@@ -251,17 +241,9 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 
 	public boolean verifyZeroKnowledgeProof()
     {	
-
-		LOGGER.info("ENTERED ZK STUFF - VERIFYING ZERO KNOWLEDGE PROOF");
-		LOGGER.info("ENTERED ZK STUFF - VERIFYING ZERO KNOWLEDGE PROOF");
-		LOGGER.info("ENTERED ZK STUFF - VERIFYING ZERO KNOWLEDGE PROOF");
-		LOGGER.info("ENTERED ZK STUFF - VERIFYING ZERO KNOWLEDGE PROOF");
-		LOGGER.info("ENTERED ZK STUFF - VERIFYING ZERO KNOWLEDGE PROOF");
 		// get the zero knowledge proof instance
 		ZeroKnowledgeProofsInterface zkp = ZeroKnowledgeProofsInterface.getInstance(this.zkpType);
-		boolean verification = zkp.verifyProof(this.zkpProofData);
-		LOGGER.info("VERIFICATION: " + verification);
-		return verification;
+		return zkp.verifyProof(this.zkpProofData);
     }
 
 	public Address[] recipientAddresses()
@@ -482,6 +464,8 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 			HyFlexChainSignature.SERIALIZER.serialize(new HyFlexChainSignature(t.sender, t.signatureType, t.signature), out);
 			out.writeLong(t.nonce);
 			TransactionType.SERIALIZER.serialize(t.transactionType, out);
+			ZeroKnowledgeProofType.SERIALIZER.serialize(t.zkpType, out);
+
 		}
 
 		public void serializeBody(HyFlexChainTransaction t, ByteBuf out) throws IOException {
@@ -489,41 +473,18 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 			txInputArraySerializer.serialize(t.inputTxs, out);
 			txOutputArraySerializer.serialize(t.outputTxs, out);
 			byteArraySerializer.serialize(t.data, out);
-			if (t.zkpType != null){
-				ZeroKnowledgeProofType.SERIALIZER.serialize(t.zkpType, out);
+			if (t.zkpType != ZeroKnowledgeProofType.NON_ZK)
 				byteArraySerializer.serialize(t.zkpProofData, out);
-			}
-		
 		}
 
 		@Override
 		public void serialize(HyFlexChainTransaction t, ByteBuf out) throws IOException {
-			LOGGER.info("SERIALIZING TRANSACTION");
-			LOGGER.info("SERIALIZING TRANSACTION");
-			LOGGER.info("SERIALIZING TRANSACTION");
-			LOGGER.info("SERIALIZING TRANSACTION");
-			LOGGER.info("SERIALIZING TRANSACTION");
-			LOGGER.info("SERIALIZING TRANSACTION");
-			LOGGER.info("SERIALIZING TRANSACTION");
-			LOGGER.info("SERIALIZING TRANSACTION");
-			LOGGER.info("SERIALIZING TRANSACTION");
-			LOGGER.info("SERIALIZING TRANSACTION");
 			serializeHeader(t, out);
 			serializeBody(t, out);
 		}
 
 		@Override
 		public HyFlexChainTransaction deserialize(ByteBuf in) throws IOException {
-			LOGGER.info("DESERIALIZING TRANSACTION");
-			LOGGER.info("DESERIALIZING TRANSACTION");
-			LOGGER.info("DESERIALIZING TRANSACTION");
-			LOGGER.info("DESERIALIZING TRANSACTION");
-			LOGGER.info("DESERIALIZING TRANSACTION");
-			LOGGER.info("DESERIALIZING TRANSACTION");
-			LOGGER.info("DESERIALIZING TRANSACTION");
-			LOGGER.info("DESERIALIZING TRANSACTION");
-			LOGGER.info("DESERIALIZING TRANSACTION");
-			LOGGER.info("DESERIALIZING TRANSACTION");
 			
 			HyFlexChainTransaction t = new HyFlexChainTransaction();
 
@@ -534,15 +495,14 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 			t.signature = sig.signature();
 			t.nonce = in.readLong();
 			t.transactionType = TransactionType.SERIALIZER.deserialize(in);
+			t.zkpType = ZeroKnowledgeProofType.SERIALIZER.deserialize(in);
 			t.smartContract = SmartContract.SERIALIZER.deserialize(in);
 			t.inputTxs = txInputArraySerializer.deserialize(in);
 			t.outputTxs = txOutputArraySerializer.deserialize(in);
 			t.data = byteArraySerializer.deserialize(in);
-			if (t.zkpType != null){
-				t.zkpType = ZeroKnowledgeProofType.SERIALIZER.deserialize(in);
+			if (t.zkpType != ZeroKnowledgeProofType.NON_ZK)
 				t.zkpProofData = byteArraySerializer.deserialize(in);
-			}
-
+			
 			return t;
 		}
 	}
@@ -556,14 +516,14 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 			+ BytesOps.serializedSize(signature)
 			+ Long.BYTES
 			+ transactionType.serializedSize()
+			+ zkpType.serializedSize()
 			+ smartContract.serializedSize()
 			+ BytesOps.serializedSize(inputTxs)
 			+ BytesOps.serializedSize(outputTxs)
 			+ BytesOps.serializedSize(data);
 
-		if (zkpType != null) {
-			size += zkpType.serializedSize()
-				+ BytesOps.serializedSize(zkpProofData);
+		if (this.zkpType != ZeroKnowledgeProofType.NON_ZK) {
+			size += BytesOps.serializedSize(zkpProofData);
 		}
 
 		return size;

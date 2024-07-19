@@ -144,7 +144,6 @@ public class TransactionManagementV2_0 implements TransactionManagement, ResetIn
 	@Override
 	public String dispatchTransaction(TxWrapper tx) throws InvalidTransactionException
 	{	
-		LOGGER.error("ERROR11");
 		verifyTx(tx.tx());
 
 		ConsensusMechanism c;
@@ -171,16 +170,6 @@ public class TransactionManagementV2_0 implements TransactionManagement, ResetIn
 	@Override
 	public String dispatchTransactionAndWait(TxWrapper tx) throws InvalidTransactionException
 	{	
-		LOGGER.info("I AM THE BEST SPAMMER IN THE REGION");
-		LOGGER.info("I AM THE BEST SPAMMER IN THE REGION");
-		LOGGER.info("I AM THE BEST SPAMMER IN THE REGION");
-		LOGGER.info("I AM THE BEST SPAMMER IN THE REGION");
-		LOGGER.info("I AM THE BEST SPAMMER IN THE REGION");
-		LOGGER.info("I AM THE BEST SPAMMER IN THE REGION");
-		LOGGER.info("I AM THE BEST SPAMMER IN THE REGION");
-		LOGGER.info("I AM THE BEST SPAMMER IN THE REGION");
-		LOGGER.info("I AM THE BEST SPAMMER IN THE REGION");
-		LOGGER.error("ERROR13");
 		verifyTx(tx.tx());
 
 		ConsensusMechanism c;

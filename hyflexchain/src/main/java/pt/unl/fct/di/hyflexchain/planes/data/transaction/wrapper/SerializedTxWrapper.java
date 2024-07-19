@@ -28,7 +28,6 @@ final class SerializedTxWrapper implements TxWrapper {
 
     @Override
     public HyFlexChainTransaction tx() throws InvalidTransactionException {
-        LOGGER.error("ERROR9");
         if (tx != null)
             return tx;
 
@@ -43,7 +42,6 @@ final class SerializedTxWrapper implements TxWrapper {
 
     @Override
     public SerializedTx serializedTx() throws InvalidTransactionException {
-        LOGGER.error("ERROR10");
         if (serializedTx != null)
             return serializedTx;
 

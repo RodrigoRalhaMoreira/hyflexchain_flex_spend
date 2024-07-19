@@ -19,8 +19,8 @@ public class ZokratesService {
         try {
             // Stop the Docker container
             String[] stopCommand = {"docker", "stop", "zokrates_container"};
-            executeDockerCommand(stopCommand);
-        } catch (IOException | InterruptedException e) {
+            new ProcessBuilder(stopCommand).start();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -30,11 +30,11 @@ public class ZokratesService {
             if (dockerContainerExists("zokrates_container")) {
                 // If the Docker container exists, start it
                 String[] startExistingCommand = {"docker", "start", "zokrates_container"};
-                executeDockerCommand(startExistingCommand);
+                new ProcessBuilder(startExistingCommand).start();
             } else {
                 // If the Docker container does not exist, create and start it
                 String[] startCommand = {"docker", "run", "-d", "--name", "zokrates_container", "zokrates/zokrates", "tail", "-f", "/dev/null"};
-                executeDockerCommand(startCommand);
+                new ProcessBuilder(startCommand).start();
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -43,26 +43,20 @@ public class ZokratesService {
 
     public boolean verifyProof(byte[] zkpData) {
         // Assuming separateAndCreateFiles function handles file creation and checks
-        try {
-            separateAndCreateFiles(zkpData);
-        } catch (IOException e) {
-            System.out.println("Error while separating and creating files");
-            e.printStackTrace();
-            return false;
-        }
-
-        System.out.println("WILL START PROOF VERIFICATION");
+    
         boolean verified = false;
         try {
-            // Copy both files to the Docker container
-            String[] copyProofCommand = {"docker", "cp", "./proof.json", "zokrates_container:/home/zokrates/"};
-            String[] copyProvingKeyCommand = {"docker", "cp", "./proving.key", "zokrates_container:/home/zokrates/"};
-            String[] copyVerificationKeyCommand = {"docker", "cp", "./verification.key", "zokrates_container:/home/zokrates/"};
-            executeDockerCommand(copyProofCommand);
-            executeDockerCommand(copyProvingKeyCommand);
-            executeDockerCommand(copyVerificationKeyCommand);
-            
-    
+            if (!fileExistsInContainer("zokrates_container", "/home/zokrates/proof.json")) {
+                separateAndCreateFiles(zkpData);
+                // Copy both files to the Docker container
+                String[] copyProofCommand = {"docker", "cp", "./proof.json", "zokrates_container:/home/zokrates/"};
+                String[] copyProvingKeyCommand = {"docker", "cp", "./proving.key", "zokrates_container:/home/zokrates/"};
+                String[] copyVerificationKeyCommand = {"docker", "cp", "./verification.key", "zokrates_container:/home/zokrates/"};
+                new ProcessBuilder(copyProofCommand).start();
+                new ProcessBuilder(copyProvingKeyCommand).start();
+                new ProcessBuilder(copyVerificationKeyCommand).start();
+            }
+        
             // Execute verification command in Docker container
             String[] dockerCommand = {"docker", "exec", "zokrates_container", "/bin/bash", "-c", "zokrates verify"};
             Process process = new ProcessBuilder(dockerCommand).start();
@@ -70,40 +64,20 @@ public class ZokratesService {
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null) {
-                System.out.println(line);
                 if (line.contains("PASSED")) {
                     verified = true;
                 }
             }
-        
-            int exitCode = process.waitFor();
-            System.out.println("Docker command execution " + (exitCode == 0 ? "successful" : "failed") + ". (Command: " + String.join(" ", dockerCommand) + ")");
-    
-            // Delete the files from the Docker container
-            //String[] deleteProofCommand = {"docker", "exec", "zokrates_container", "/bin/bash", "-c", "rm /home/zokrates/proof.json"};
-            //String[] deleteProvingKeyCommand = {"docker", "exec", "zokrates_container", "/bin/bash", "-c", "rm /home/zokrates/proving.key"};
-            //executeDockerCommand(deleteProofCommand);
-            //executeDockerCommand(deleteProvingKeyCommand);
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {            
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return verified;
     }
 
     // helper functions
-
-    private void executeDockerCommand(String[] command) throws IOException, InterruptedException {
-        Process process = new ProcessBuilder(command).start();
-    
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            System.out.println(line);
-        }
-    
-        int exitCode = process.waitFor();
-        System.out.println("Docker command execution " + (exitCode == 0 ? "successful" : "failed") + ". (Command: " + String.join(" ", command) + ")");
-    }
 
     private boolean dockerContainerExists(String containerName) throws IOException, InterruptedException {
         String[] checkCommand = {"docker", "ps", "-a", "-q", "--filter", "name=" + containerName};
@@ -136,7 +110,6 @@ public class ZokratesService {
         Files.write(Paths.get("proving.key"), provingKeyBytes);
         Files.write(Paths.get("verification.key"), verificationKeyBytes);
     
-        System.out.println("Files proof.json, proving.key, and verification.key created successfully");
     }
 
     private int findDelimiterIndex(byte[] data, byte[] delimiter) {
@@ -154,4 +127,13 @@ public class ZokratesService {
         }
         return -1; // Delimiter not found
     }
+
+    public boolean fileExistsInContainer(String containerName, String filePath) throws IOException, InterruptedException {
+    String checkFileCommand = String.format("docker exec %s test -f %s && echo found || echo not found", containerName, filePath);
+    Process process = new ProcessBuilder("/bin/bash", "-c", checkFileCommand).start();
+    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+    String output = reader.readLine();
+    process.waitFor();
+    return "found".equals(output);
+}
 }

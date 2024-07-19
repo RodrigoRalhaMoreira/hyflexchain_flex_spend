@@ -26,13 +26,11 @@ final class DecodedTxWrapper implements TxWrapper {
 
     @Override
     public HyFlexChainTransaction tx() throws InvalidTransactionException {
-        LOGGER.error("ERROR7");
         return tx;
     }
 
     @Override
     public SerializedTx serializedTx() throws InvalidTransactionException {
-        LOGGER.error("ERROR8");
         if (serializedTx != null)
             return serializedTx;
 

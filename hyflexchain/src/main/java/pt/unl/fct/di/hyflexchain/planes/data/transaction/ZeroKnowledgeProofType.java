@@ -13,6 +13,9 @@ import pt.unl.fct.di.hyflexchain.util.serializer.ISerializer;
  */
 public enum ZeroKnowledgeProofType implements BytesOps {
 	
+
+
+    NON_ZK("NON_ZK", (byte) 0),
 	/**
 	 * Regular transactions: a transaction that transfers assets/tokens.
 	 */
