@@ -9,9 +9,6 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import pt.unl.fct.di.hyflexchain.planes.zero_knowledge_proofs.ZeroKnowledgeProofsInterface;
@@ -30,7 +27,6 @@ import pt.unl.fct.di.hyflexchain.util.serializer.ISerializer;
 public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 
 	public static final Serializer SERIALIZER = new Serializer();
-	private static final Logger LOGGER = LoggerFactory.getLogger(HyFlexChainTransaction.class);
 
 
 	/**

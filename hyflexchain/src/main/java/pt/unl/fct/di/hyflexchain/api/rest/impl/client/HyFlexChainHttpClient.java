@@ -7,9 +7,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
@@ -27,10 +24,7 @@ public class HyFlexChainHttpClient implements Closeable {
 
     private static final String PREPEND_URL = "api/rest";
 
-    protected Client client;
-
-    Logger LOG = LoggerFactory.getLogger(HyFlexChainHttpClient.class);
-    
+    protected Client client;    
 
     
     public HyFlexChainHttpClient()
@@ -55,9 +49,6 @@ public class HyFlexChainHttpClient implements Closeable {
     public Future<String> sendTransactionAsync(URI endpoint, HyFlexChainTransaction tx,
         InvocationCallback<String> callback)
     {   
-        LOG.error("***************************Sending transaction to " + endpoint);
-        LOG.error("***************************Sending transaction to " + endpoint);
-        LOG.error("***************************Sending transaction to " + endpoint);
         
         return this.client.target(endpoint).path(PREPEND_URL).path(TransactionInterfaceRest.PATH)
             .path("transaction-json")

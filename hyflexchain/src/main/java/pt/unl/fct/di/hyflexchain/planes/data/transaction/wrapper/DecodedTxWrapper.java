@@ -2,9 +2,6 @@ package pt.unl.fct.di.hyflexchain.planes.data.transaction.wrapper;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import pt.unl.fct.di.hyflexchain.planes.application.ti.InvalidTransactionException;
 import pt.unl.fct.di.hyflexchain.planes.data.transaction.HyFlexChainTransaction;
 import pt.unl.fct.di.hyflexchain.planes.data.transaction.SerializedTx;
@@ -14,9 +11,6 @@ final class DecodedTxWrapper implements TxWrapper {
     private final HyFlexChainTransaction tx;
 
     private SerializedTx serializedTx;
-
-    protected static final Logger LOGGER = LoggerFactory.getLogger(DecodedTxWrapper.class);
-
     /**
      * @param tx
      */
