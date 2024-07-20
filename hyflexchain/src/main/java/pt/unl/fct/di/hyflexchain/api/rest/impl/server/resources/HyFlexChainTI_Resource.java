@@ -32,7 +32,7 @@ public class HyFlexChainTI_Resource implements TransactionInterfaceRest {
 
 	@Override
 	public String sendTransactionAndWait(HyFlexChainTransaction tx)
-	{
+	{	
 		try {
 			return hyflexchainInterface.getTi().sendTransactionAndWait(TxWrapper.from(tx));
 		} catch (InvalidTransactionException e) {

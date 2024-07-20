@@ -11,6 +11,7 @@ import java.security.SignatureException;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import pt.unl.fct.di.hyflexchain.planes.zero_knowledge_proofs.ZeroKnowledgeProofsInterface;
 import pt.unl.fct.di.hyflexchain.util.BytesOps;
 import pt.unl.fct.di.hyflexchain.util.Utils;
 import pt.unl.fct.di.hyflexchain.util.crypto.Crypto;
@@ -26,6 +27,7 @@ import pt.unl.fct.di.hyflexchain.util.serializer.ISerializer;
 public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 
 	public static final Serializer SERIALIZER = new Serializer();
+
 
 	/**
 	 * The version of the transaction.
@@ -60,6 +62,11 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 	protected TransactionType transactionType;
 
 	/**
+	 * The type of zero-knowledge proof used in this transaction
+	 */
+	protected ZeroKnowledgeProofType zkpType;
+
+	/**
 	 * A smart contract to create, revoke or execute.
 	 */
 	protected SmartContract smartContract;
@@ -80,6 +87,12 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 	protected byte[] data;
 
 	/**
+	 * The zero-knowledge proof data
+	 */
+
+	protected byte[] zkpProofData;
+
+	/**
 	 * @param sender
 	 * @param signatureType
 	 * @param signature
@@ -94,7 +107,7 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 			long nonce, TransactionType transactionType, SmartContract smartContract, TxInput[] inputTxs,
 			UTXO[] outputTxs, byte[] data) {
 		return new HyFlexChainTransaction(Version.V1_0.name(), sender, signatureType, signature,
-			nonce, transactionType, smartContract, inputTxs, outputTxs, data);
+			nonce, transactionType, smartContract, inputTxs, outputTxs, data, ZeroKnowledgeProofType.NON_ZK, null);
 	}
 
 	/**
@@ -107,7 +120,7 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 	public static HyFlexChainTransaction createContract(Address sender, SignatureAlgorithm signatureType, byte[] signature,
 			long nonce, SmartContract smartContract) {
 		return new HyFlexChainTransaction(Version.V1_0.name(), sender, signatureType, signature,
-			nonce, TransactionType.CONTRACT_CREATE, smartContract, new TxInput[0], new UTXO[0], new byte[0]);
+			nonce, TransactionType.CONTRACT_CREATE, smartContract, new TxInput[0], new UTXO[0], new byte[0], ZeroKnowledgeProofType.NON_ZK, null);
 	}
 
 	/**
@@ -120,7 +133,7 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 	public static HyFlexChainTransaction revokeContract(Address sender, SignatureAlgorithm signatureType, byte[] signature,
 			long nonce, SmartContract smartContract) {
 		return new HyFlexChainTransaction(Version.V1_0.name(), sender, signatureType, signature,
-			nonce, TransactionType.CONTRACT_REVOKE, smartContract, new TxInput[0], new UTXO[0], new byte[0]);
+			nonce, TransactionType.CONTRACT_REVOKE, smartContract, new TxInput[0], new UTXO[0], new byte[0], ZeroKnowledgeProofType.NON_ZK, null);
 	}
 
 	/**
@@ -156,6 +169,37 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 		this.inputTxs = inputTxs;
 		this.outputTxs = outputTxs;
 		this.data = data;
+		this.zkpType = ZeroKnowledgeProofType.NON_ZK;
+		this.zkpProofData = null;
+	}
+
+	/**
+	 * @param version
+	 * @param sender
+	 * @param signatureType
+	 * @param signature
+	 * @param nonce
+	 * @param transactionType
+	 * @param smartContract
+	 * @param inputTxs
+	 * @param outputTxs
+	 * @param data
+	 */
+	public HyFlexChainTransaction(String version, Address sender, SignatureAlgorithm signatureType, byte[] signature,
+			long nonce, TransactionType transactionType, SmartContract smartContract, TxInput[] inputTxs,
+			UTXO[] outputTxs, byte[] data, ZeroKnowledgeProofType zkpType, byte[] zkpProofData) {
+		this.version = version;
+		this.sender = sender;
+		this.signatureType = signatureType;
+		this.signature = signature;
+		this.nonce = nonce;
+		this.transactionType = transactionType;
+		this.smartContract = smartContract;
+		this.inputTxs = inputTxs;
+		this.outputTxs = outputTxs;
+		this.data = data;
+		this.zkpType = zkpType;
+		this.zkpProofData = zkpProofData;
 	}
 
 
@@ -172,7 +216,11 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
     }
 
 	public boolean verifySignature() throws InvalidAddressException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
-    {
+    {	
+		// check if it is a private transaction
+		if (this.zkpType != ZeroKnowledgeProofType.NON_ZK) {
+			return verifyZeroKnowledgeProof();
+		}
         var key = this.sender.readPublicKey();
 		var sigAlg = this.signatureType;
 		return verifySignature(key, sigAlg);
@@ -185,6 +233,13 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 		update(signature);
 
 		return signature.verify(this.signature);
+    }
+
+	public boolean verifyZeroKnowledgeProof()
+    {	
+		// get the zero knowledge proof instance
+		ZeroKnowledgeProofsInterface zkp = ZeroKnowledgeProofsInterface.getInstance(this.zkpType);
+		return zkp.verifyProof(this.zkpProofData);
     }
 
 	public Address[] recipientAddresses()
@@ -346,6 +401,23 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 		this.data = data;
 	}
 
+	public ZeroKnowledgeProofType getZkpType() {
+		return zkpType;
+	}
+
+	public void setZkpType(ZeroKnowledgeProofType zkpType) {
+		this.zkpType = zkpType;
+	}
+
+	public byte[] getZkpProofData() {
+		return zkpProofData;
+	}
+
+	public void setZkpProofData(byte[] zkpProofData) {
+		this.zkpProofData = zkpProofData;
+	}
+
+
 	/**
 	 * The version of this transaction
 	 */
@@ -388,6 +460,8 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 			HyFlexChainSignature.SERIALIZER.serialize(new HyFlexChainSignature(t.sender, t.signatureType, t.signature), out);
 			out.writeLong(t.nonce);
 			TransactionType.SERIALIZER.serialize(t.transactionType, out);
+			ZeroKnowledgeProofType.SERIALIZER.serialize(t.zkpType, out);
+
 		}
 
 		public void serializeBody(HyFlexChainTransaction t, ByteBuf out) throws IOException {
@@ -395,6 +469,8 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 			txInputArraySerializer.serialize(t.inputTxs, out);
 			txOutputArraySerializer.serialize(t.outputTxs, out);
 			byteArraySerializer.serialize(t.data, out);
+			if (t.zkpType != ZeroKnowledgeProofType.NON_ZK)
+				byteArraySerializer.serialize(t.zkpProofData, out);
 		}
 
 		@Override
@@ -405,6 +481,7 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 
 		@Override
 		public HyFlexChainTransaction deserialize(ByteBuf in) throws IOException {
+			
 			HyFlexChainTransaction t = new HyFlexChainTransaction();
 
 			t.version = stringSerializer.deserialize(in);
@@ -414,28 +491,38 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 			t.signature = sig.signature();
 			t.nonce = in.readLong();
 			t.transactionType = TransactionType.SERIALIZER.deserialize(in);
+			t.zkpType = ZeroKnowledgeProofType.SERIALIZER.deserialize(in);
 			t.smartContract = SmartContract.SERIALIZER.deserialize(in);
 			t.inputTxs = txInputArraySerializer.deserialize(in);
 			t.outputTxs = txOutputArraySerializer.deserialize(in);
 			t.data = byteArraySerializer.deserialize(in);
-
+			if (t.zkpType != ZeroKnowledgeProofType.NON_ZK)
+				t.zkpProofData = byteArraySerializer.deserialize(in);
+			
 			return t;
 		}
 	}
 
 	@Override
 	public int serializedSize()
-	{
-		return BytesOps.serializedSize(version)	
-			+ sender.serializedSize()			
+	{	
+		int size = BytesOps.serializedSize(version)    
+			+ sender.serializedSize()            
 			+ signatureType.serializedSize()
 			+ BytesOps.serializedSize(signature)
 			+ Long.BYTES
 			+ transactionType.serializedSize()
+			+ zkpType.serializedSize()
 			+ smartContract.serializedSize()
 			+ BytesOps.serializedSize(inputTxs)
 			+ BytesOps.serializedSize(outputTxs)
 			+ BytesOps.serializedSize(data);
+
+		if (this.zkpType != ZeroKnowledgeProofType.NON_ZK) {
+			size += BytesOps.serializedSize(zkpProofData);
+		}
+
+		return size;
 	}
 
 	@Override

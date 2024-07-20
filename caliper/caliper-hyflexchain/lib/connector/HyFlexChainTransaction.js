@@ -45,6 +45,11 @@ class HyFlexChainTransaction
 	
 	static SHA256withECDSA = "SHA256withECDSA";
 
+	// ZKP transaction type
+
+	static ZKSNARKS_ZOKRATES_GROTH_16 = "ZKSNARKS_ZOKRATES_GROTH_16";
+	static NON_ZK = "NON_ZK";	
+
 
 	
 
@@ -54,8 +59,10 @@ class HyFlexChainTransaction
 	 * @param {Buffer} origin 
 	 * @param {object[]} inputTxs 
 	 * @param {object[]} outputTxs 
+	 * @param {(string | Buffer)[]} zkType
+	 * @param {Buffer []} zkpProofData
 	 */
-	constructor(txType, origin, inputTxs, outputTxs)
+	constructor(txType, origin, inputTxs, outputTxs, zkType = HyFlexChainTransaction.NON_ZK, zkpProofData = [])
 	{
 		this.version = "V1_0";
 		this.sender = {address : origin};
@@ -63,10 +70,12 @@ class HyFlexChainTransaction
 		this.signature = undefined;
 		this.nonce = Util.getRandomInt(0, Number.MAX_SAFE_INTEGER);
 		this.transactionType = txType;
+		this.zkpType = zkType;
 		this.smartContract = undefined;
 		this.inputTxs = inputTxs;
 		this.outputTxs = outputTxs;
 		this.data = Buffer.alloc(1);
+		this.zkpProofData = zkpProofData;
 	}
 
 
@@ -117,16 +126,18 @@ class HyFlexChainTransaction
 	toJson()
 	{
 		return {
-            version : this.version,
+			version : this.version,
             sender : {address : this.sender.address.toString("base64")},
             signatureType : this.signatureType,
             signature : this.signature.toString("base64"),
             nonce : this.nonce,
             transactionType : this.transactionType[0],
+			zkpType: this.zkpType.toString("base64"),
             smartContract : HyFlexChainTransaction.toJsonSmartContract(this.smartContract),
             inputTxs : this.inputTxs.map(v => HyFlexChainTransaction.toJsonInputTx(v)),
             outputTxs : this.outputTxs.map(v => HyFlexChainTransaction.toJsonOutputTx(v)),
-            data : this.data.toString("base64")
+            data : this.data.toString("base64"),
+			zkpProofData: this.zkpProofData.toString("base64"),
         }
 	}
 

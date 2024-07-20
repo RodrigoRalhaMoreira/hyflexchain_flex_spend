@@ -11,7 +11,6 @@ final class DecodedTxWrapper implements TxWrapper {
     private final HyFlexChainTransaction tx;
 
     private SerializedTx serializedTx;
-
     /**
      * @param tx
      */

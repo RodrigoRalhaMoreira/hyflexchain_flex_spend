@@ -19,7 +19,7 @@ public class TransactionInterfaceV1_0 implements TransactionInterface {
 
 	@Override
 	public void verifyTx(HyFlexChainTransaction tx) throws InvalidTransactionException
-	{
+	{	
 		HyFlexChainTransaction.Version version;
 		try {
 			version = HyFlexChainTransaction.Version.valueOf(tx.getVersion());
@@ -47,14 +47,14 @@ public class TransactionInterfaceV1_0 implements TransactionInterface {
 
 	@Override
 	public String sendTransaction(TxWrapper tx) throws InvalidTransactionException
-	{
+	{	
 		verifyTx(tx.tx());
 		return TransactionManagement.getInstance().dispatchTransaction(tx);	
 	}
 
 	@Override
 	public String sendTransactionAndWait(TxWrapper tx) throws InvalidTransactionException
-	{
+	{	
 		verifyTx(tx.tx());
 		return TransactionManagement.getInstance().dispatchTransactionAndWait(tx);
 	}

@@ -143,7 +143,7 @@ public class TransactionManagementV2_0 implements TransactionManagement, ResetIn
 
 	@Override
 	public String dispatchTransaction(TxWrapper tx) throws InvalidTransactionException
-	{
+	{	
 		verifyTx(tx.tx());
 
 		ConsensusMechanism c;
@@ -169,7 +169,7 @@ public class TransactionManagementV2_0 implements TransactionManagement, ResetIn
 
 	@Override
 	public String dispatchTransactionAndWait(TxWrapper tx) throws InvalidTransactionException
-	{
+	{	
 		verifyTx(tx.tx());
 
 		ConsensusMechanism c;
