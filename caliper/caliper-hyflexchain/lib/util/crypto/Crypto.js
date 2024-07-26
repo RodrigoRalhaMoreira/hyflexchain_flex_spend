@@ -138,6 +138,30 @@ class Crypto
 		return createHash("sha256");
 	}
 
+	extractPublicKeyCoordinates(publicKeyHex) {
+		// Remove the ASN.1 structure and extract the key part (04 + x + y)
+		const keyPart = publicKeyHex.slice(-128); // Last 128 hex characters
+		const x = keyPart.slice(2, 66); // 64 hex characters after the 04
+		const y = keyPart.slice(66); // Last 64 hex characters
+	
+		return { x, y };
+	}
+
+	hexToDecimal(hex) {
+		return BigInt(`0x${hex}`).toString(10);
+	}
+
+	extractPrivateKeyHex(privateKey) {
+		const privateKeyDER = privateKey.export({
+			format: 'der',
+			type: 'pkcs8',
+			cipher: 'aes-256-cbc',
+			passphrase: PASSPHRASE,
+		});
+		// Assuming the key length is 32 bytes (64 hex characters)
+		// The private key itself is usually at the end of the DER structure
+		return privateKeyDER.toString('hex').slice(-64);
+	}
 }
 
 module.exports = Crypto;

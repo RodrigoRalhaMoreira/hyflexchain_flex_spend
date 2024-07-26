@@ -137,7 +137,7 @@ class HyFlexChainTransaction
             inputTxs : this.inputTxs.map(v => HyFlexChainTransaction.toJsonInputTx(v)),
             outputTxs : this.outputTxs.map(v => HyFlexChainTransaction.toJsonOutputTx(v)),
             data : this.data.toString("base64"),
-			zkpProofData: this.zkpProofData.toString("base64"),
+			//zkpProofData: this.zkpProofData.toString("base64"),
         }
 	}
 
