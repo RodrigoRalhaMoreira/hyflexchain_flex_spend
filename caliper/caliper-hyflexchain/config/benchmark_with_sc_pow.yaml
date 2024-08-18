@@ -1,12 +1,12 @@
 test:
   workers:
-    number: 2
+    number: 1
   rounds:
 
-    - label: Submit 5000 Transactions 50 tps
+    - label: Submit Transactions 50 tps
       description: Test description for transfering money between accounts.
-      # txDuration: 60
-      txNumber: 5000
+      txDuration: 60
+      # txNumber: 5000
       rateControl:
         type: fixed-rate
         opts:
@@ -14,49 +14,49 @@ test:
       workload:
         module: lib/benchmarks/CreateTransactionPowWithSC.js
 
-    - label: Submit 10000 Transactions 100 tps
-      description: Test description for transfering money between accounts.
-      # txDuration: 60
-      txNumber: 10000
-      rateControl:
-        type: fixed-rate
-        opts:
-          tps: 100
-      workload:
-        module: lib/benchmarks/CreateTransactionPowWithSC.js
+    # - label: Submit 10000 Transactions 100 tps
+    #   description: Test description for transfering money between accounts.
+    #   # txDuration: 60
+    #   txNumber: 10000
+    #   rateControl:
+    #     type: fixed-rate
+    #     opts:
+    #       tps: 100
+    #   workload:
+    #     module: lib/benchmarks/CreateTransactionPowWithSC.js
 
-    - label: Submit 20000 Transactions 200 tps
-      description: Test description for transfering money between accounts.
-      # txDuration: 60
-      txNumber: 20000
-      rateControl:
-        type: fixed-rate
-        opts:
-          tps: 200
-      workload:
-        module: lib/benchmarks/CreateTransactionPowWithSC.js
+    # - label: Submit 20000 Transactions 200 tps
+    #   description: Test description for transfering money between accounts.
+    #   # txDuration: 60
+    #   txNumber: 20000
+    #   rateControl:
+    #     type: fixed-rate
+    #     opts:
+    #       tps: 200
+    #   workload:
+    #     module: lib/benchmarks/CreateTransactionPowWithSC.js
 
-    - label: Submit 40000 Transactions 400 tps
-      description: Test description for transfering money between accounts.
-      # txDuration: 60
-      txNumber: 40000
-      rateControl:
-        type: fixed-rate
-        opts:
-          tps: 400
-      workload:
-        module: lib/benchmarks/CreateTransactionPowWithSC.js
+    # - label: Submit 40000 Transactions 400 tps
+    #   description: Test description for transfering money between accounts.
+    #   # txDuration: 60
+    #   txNumber: 40000
+    #   rateControl:
+    #     type: fixed-rate
+    #     opts:
+    #       tps: 400
+    #   workload:
+    #     module: lib/benchmarks/CreateTransactionPowWithSC.js
 
-    - label: Submit 80000 Transactions 800 tps
-      description: Test description for transfering money between accounts.
-      # txDuration: 60
-      txNumber: 80000
-      rateControl:
-        type: fixed-rate
-        opts:
-          tps: 800
-      workload:
-        module: lib/benchmarks/CreateTransactionPowWithSC.js
+    # - label: Submit 80000 Transactions 800 tps
+    #   description: Test description for transfering money between accounts.
+    #   # txDuration: 60
+    #   txNumber: 80000
+    #   rateControl:
+    #     type: fixed-rate
+    #     opts:
+    #       tps: 800
+    #   workload:
+    #     module: lib/benchmarks/CreateTransactionPowWithSC.js
   
 # monitors:
 #   resource:
