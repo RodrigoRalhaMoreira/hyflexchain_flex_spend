@@ -22,7 +22,7 @@ class Context
         const encodedWorkerKeyPair = workerArgs.getKeyPair();
         this.encodedPublicKey = encodedWorkerKeyPair[0];
         this.keyPair = crypto.decodeKeyPair(encodedWorkerKeyPair);
-
+        
         this.destAddresses = workerArgs.getDestAddresses()
             .map(a => Buffer.from(a.substring(2), "hex"));
 
