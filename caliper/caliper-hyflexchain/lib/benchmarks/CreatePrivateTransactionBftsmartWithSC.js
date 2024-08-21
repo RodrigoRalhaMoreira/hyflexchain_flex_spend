@@ -23,14 +23,11 @@ const Context = require("../connector/Context");
 const Util = require('../util/Util');
 
 const Buffer = require('buffer').Buffer;
-const ZokratesService = require('../util/zokrates/ZokratesService');
-const fs = require('fs').promises;
-const path = require('path');
 
 /**
  * Workload module for the benchmark round.
  */
-class CreateTransactionPowWorkload extends WorkloadModuleBase {
+class CreateTransactionBftsmartWorkload extends WorkloadModuleBase {
 
     /**
      * Initializes the workload module instance.
@@ -39,7 +36,7 @@ class CreateTransactionPowWorkload extends WorkloadModuleBase {
         super();
         this.txIndex = 0;
     }
-
+    
     /**
      * Assemble TXs for the round.
      * @return {Promise<TxStatus[]>}
@@ -51,11 +48,11 @@ class CreateTransactionPowWorkload extends WorkloadModuleBase {
             // reference smart contract
             if (this.sutAdapter.hyflexchainConfig.reference_smart_contract)
             {
-                const ref = this.sutContext.installedContracts.get("pow");
+                const ref = this.sutContext.installedContracts.get("bftsmart");
                 this.smartContract = HyFlexChainTransaction.smartContractRef(ref);
             } else // pyggyback smart contract
             {
-                const contractData = this.sutAdapter.smart_contracts_map.get("pow");
+                const contractData = this.sutAdapter.smart_contracts_map.get("bftsmart");
                 this.smartContract = HyFlexChainTransaction.smartContractCode(contractData);
             }
         }
@@ -66,7 +63,8 @@ class CreateTransactionPowWorkload extends WorkloadModuleBase {
 
         const inputTxs = [HyFlexChainTransaction.createInputTx(Buffer.from("some hash", "utf-8"), 0)];
         const outputTxs = [HyFlexChainTransaction.createOutputTx(destAddress, val)];
-        const tx = new HyFlexChainTransaction(HyFlexChainTransaction.TRANSFER, originPubKey, inputTxs, outputTxs, HyFlexChainTransaction.ZKSNARKS_ZOKRATES_GROTH_16, this.sutContext.zkpProofData);
+        const zkpProofData = await this.getZkpProofData();
+        const tx = new HyFlexChainTransaction(HyFlexChainTransaction.TRANSFER, originPubKey, inputTxs, outputTxs, HyFlexChainTransaction.ZKSNARKS_ZOKRATES_GROTH_16, zkpProofData);
         tx.nonce = this.txIndex;
         tx.smartContract = this.smartContract;
 
@@ -85,7 +83,22 @@ class CreateTransactionPowWorkload extends WorkloadModuleBase {
         const i = Util.getRandomInt(0, destAddresses.length);
         return destAddresses[i];
     }
-
+    
+    /**
+     * 
+     * Private function to get ZKP proof data.
+     * @return {Promise<Buffer[]>}
+     */
+    async getZkpProofData() {
+        const [proofBytes, provingKeyBytes, verificationKeyBytes] = await Promise.all([
+            fs.readFile(path.join(__dirname, "../util/zokrates/proof.json")),
+            fs.readFile(path.join(__dirname, "../util/zokrates/proving.key")),
+            fs.readFile(path.join(__dirname, "../util/zokrates/verification.key")),
+        ]);
+        const DELIMITER = Buffer.from("UNIQUE_DELIMITER_SEQUENCE");
+        const DELIMITER2 = Buffer.from("UNIQUE_DELIMITER_SEQUENCE2");
+        return Buffer.concat([proofBytes, DELIMITER, provingKeyBytes, DELIMITER2, verificationKeyBytes]);    
+    }
 }
 
 /**
@@ -93,7 +106,7 @@ class CreateTransactionPowWorkload extends WorkloadModuleBase {
  * @return {WorkloadModuleInterface}
  */
 function createWorkloadModule() {
-    return new CreateTransactionPowWorkload();
+    return new CreateTransactionBftsmartWorkload();
 }
 
 module.exports.createWorkloadModule = createWorkloadModule;

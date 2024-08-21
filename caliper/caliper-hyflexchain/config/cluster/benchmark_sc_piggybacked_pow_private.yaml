@@ -3,14 +3,14 @@ test:
     number: 1
   rounds:
 
-    - label: Submit Private Transactions 5 tps - PoW
+    - label: Submit Private Transactions 50 tps - PoW
       description: Submit Private PoW transactions (sc piggybacked)
       txDuration: 60
       # txNumber: 5000
       rateControl:
         type: fixed-rate
         opts:
-          tps: 5
+          tps: 50
       workload:
         module: lib/benchmarks/CreatePrivateTransactionPowWithSC.js
 

@@ -1,12 +1,12 @@
 test:
   workers:
-    number: 2
+    number: 1
   rounds:
 
     - label: Submit 5000 Transactions 50 tps - BFT-SMaRt
       description: Submit BFT-SMaRt transactions
-      # txDuration: 60
-      txNumber: 5000
+      txDuration: 60
+      # txNumber: 5000
       rateControl:
         type: fixed-rate
         opts:
@@ -14,16 +14,16 @@ test:
       workload:
         module: lib/benchmarks/CreateTransactionBftsmartWithSC.js
 
-    - label: Submit 10000 Transactions 100 tps - BFT-SMaRt
-      description: Submit BFT-SMaRt transactions
-      # txDuration: 60
-      txNumber: 10000
-      rateControl:
-        type: fixed-rate
-        opts:
-          tps: 100
-      workload:
-        module: lib/benchmarks/CreateTransactionBftsmartWithSC.js
+    # - label: Submit 10000 Transactions 100 tps - BFT-SMaRt
+    #   description: Submit BFT-SMaRt transactions
+    #   # txDuration: 60
+    #   txNumber: 10000
+    #   rateControl:
+    #     type: fixed-rate
+    #     opts:
+    #       tps: 100
+    #   workload:
+    #     module: lib/benchmarks/CreateTransactionBftsmartWithSC.js
 
     # - label: Submit 20000 Transactions 200 tps - BFT-SMaRt
     #   description: Test description for transfering money between accounts.

@@ -207,6 +207,7 @@ class HyFlexChainConnector extends ConnectorBase {
      */
     async getContext(roundIndex, args) {
         let context = new Context(WorkerArgs.fromArgs(args), this.workerIndex, this.cryptoUtils);
+        await context.initialize();
         this.context = context;
 
         // connect to replica
