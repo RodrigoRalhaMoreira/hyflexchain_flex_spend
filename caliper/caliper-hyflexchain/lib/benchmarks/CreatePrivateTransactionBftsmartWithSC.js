@@ -63,8 +63,7 @@ class CreateTransactionBftsmartWorkload extends WorkloadModuleBase {
 
         const inputTxs = [HyFlexChainTransaction.createInputTx(Buffer.from("some hash", "utf-8"), 0)];
         const outputTxs = [HyFlexChainTransaction.createOutputTx(destAddress, val)];
-        const zkpProofData = await this.getZkpProofData();
-        const tx = new HyFlexChainTransaction(HyFlexChainTransaction.TRANSFER, originPubKey, inputTxs, outputTxs, HyFlexChainTransaction.ZKSNARKS_ZOKRATES_GROTH_16, zkpProofData);
+        const tx = new HyFlexChainTransaction(HyFlexChainTransaction.TRANSFER, originPubKey, inputTxs, outputTxs, HyFlexChainTransaction.ZKSNARKS_ZOKRATES_GROTH_16, this.sutContext.zkpProofData);
         tx.nonce = this.txIndex;
         tx.smartContract = this.smartContract;
 
@@ -84,21 +83,6 @@ class CreateTransactionBftsmartWorkload extends WorkloadModuleBase {
         return destAddresses[i];
     }
     
-    /**
-     * 
-     * Private function to get ZKP proof data.
-     * @return {Promise<Buffer[]>}
-     */
-    async getZkpProofData() {
-        const [proofBytes, provingKeyBytes, verificationKeyBytes] = await Promise.all([
-            fs.readFile(path.join(__dirname, "../util/zokrates/proof.json")),
-            fs.readFile(path.join(__dirname, "../util/zokrates/proving.key")),
-            fs.readFile(path.join(__dirname, "../util/zokrates/verification.key")),
-        ]);
-        const DELIMITER = Buffer.from("UNIQUE_DELIMITER_SEQUENCE");
-        const DELIMITER2 = Buffer.from("UNIQUE_DELIMITER_SEQUENCE2");
-        return Buffer.concat([proofBytes, DELIMITER, provingKeyBytes, DELIMITER2, verificationKeyBytes]);    
-    }
 }
 
 /**
