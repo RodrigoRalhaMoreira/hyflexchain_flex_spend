@@ -11,6 +11,7 @@ server_port=`expr 18000 + $replicaId`
 network_name=hyflexchain
 
 replica_name=replica-$replicaId
+zokrates_name=zokrates-$replicaId
 
 address=$replica_name
 contact=replica-0:10000
@@ -37,3 +38,5 @@ docker run --rm -d --name $replica_name -h $replica_name  \
 	-BFT_SMART Blockmess_Connector_Host=blockmess-server-bft-smart-$replicaId \
 	-BFT_SMART Blockmess_Connector_Port=`expr 15000 + $replicaId`
 
+# Launch the ZoKrates container for this node
+docker run --rm -d --name $zokrates_name "zokrates/zokrates" tail -f /dev/null

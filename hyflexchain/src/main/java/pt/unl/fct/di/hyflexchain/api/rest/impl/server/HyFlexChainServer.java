@@ -15,6 +15,8 @@ import pt.unl.fct.di.hyflexchain.api.rest.impl.server.resources.HyFlexChainStats
 import pt.unl.fct.di.hyflexchain.api.rest.impl.server.resources.HyFlexChainTI_Resource;
 import pt.unl.fct.di.hyflexchain.api.rest.impl.server.resources.settings.PrivateSettingsResource;
 import pt.unl.fct.di.hyflexchain.planes.application.ApplicationInterface;
+import pt.unl.fct.di.hyflexchain.planes.zero_knowledge_proofs.ZKSnarksZokratesGroth16;
+import pt.unl.fct.di.hyflexchain.planes.zero_knowledge_proofs.ZeroKnowledgeProofsInterface;
 
 public class HyFlexChainServer
 {
@@ -44,6 +46,17 @@ public class HyFlexChainServer
 			HyFlexChainTI_Resource.setHyflexchainInterface(app);
 			HyFlexChainSCMI_Resource.setHyflexchainInterface(app);
 			PrivateSettingsResource.setHyflexchainInterface(app);
+
+			// default zkp container setup
+			ZeroKnowledgeProofsInterface zkp = ZeroKnowledgeProofsInterface.getInstance();
+			if (zkp instanceof ZKSnarksZokratesGroth16) {
+				ZKSnarksZokratesGroth16 zkpInstance = (ZKSnarksZokratesGroth16) zkp;
+				zkpInstance.setContainerName(args[0]);
+			} else {
+				throw new ClassCastException("The instance is not of type ZKSnarksZokratesGroth16");
+			}
+			
+
             
 			URI uri = new URI(String.format("https://%s:%d/api/rest", "0.0.0.0", port));
 			// URI uri = new URI(String.format("http://%s:%d/api/rest", "0.0.0.0", port));

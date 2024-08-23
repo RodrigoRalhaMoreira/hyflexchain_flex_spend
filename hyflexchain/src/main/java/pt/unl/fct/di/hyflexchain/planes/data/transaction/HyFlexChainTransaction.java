@@ -239,6 +239,7 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
     {	
 		// get the zero knowledge proof instance
 		ZeroKnowledgeProofsInterface zkp = ZeroKnowledgeProofsInterface.getInstance(this.zkpType);
+		
 		return zkp.verifyProof(this.zkpProofData);
     }
 

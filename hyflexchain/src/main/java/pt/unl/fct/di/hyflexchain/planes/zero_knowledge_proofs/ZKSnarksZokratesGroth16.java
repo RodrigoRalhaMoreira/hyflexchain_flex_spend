@@ -5,7 +5,6 @@ public class ZKSnarksZokratesGroth16 implements ZeroKnowledgeProofsInterface {
 
     private final ZokratesService zokratesService;
 
-    // this might have to be changed to a singleton
     public ZKSnarksZokratesGroth16() {
         this.zokratesService = new ZokratesService();
     }
@@ -13,6 +12,11 @@ public class ZKSnarksZokratesGroth16 implements ZeroKnowledgeProofsInterface {
     public ZKSnarksZokratesGroth16(ZokratesService zokratesService) {
         this.zokratesService = zokratesService;
     }
+
+    public void setContainerName(String replicaId) {
+        this.zokratesService.setContainerName(replicaId);
+    }
+
 
     @Override
     public boolean verifyProof(byte[] proof) {

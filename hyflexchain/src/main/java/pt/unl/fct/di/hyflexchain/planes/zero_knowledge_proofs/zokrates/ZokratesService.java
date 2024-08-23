@@ -10,55 +10,35 @@ public class ZokratesService {
 
     private static final byte[] DELIMITER = "UNIQUE_DELIMITER_SEQUENCE".getBytes();
     private static final byte[] DELIMITER2 = "UNIQUE_DELIMITER_SEQUENCE2".getBytes();
+    private String containerName = "zokrates-";
+
 
     public ZokratesService() {
-        startZokratesService();
     }
 
-    public void stopZokratesService() {
-        try {
-            // Stop the Docker container
-            String[] stopCommand = {"docker", "stop", "zokrates_container"};
-            new ProcessBuilder(stopCommand).start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void setContainerName(String replicaId) {
+        this.containerName = this.containerName + replicaId;
     }
 
-    public void startZokratesService() {
-        try {
-            if (dockerContainerExists("zokrates_container")) {
-                // If the Docker container exists, start it
-                String[] startExistingCommand = {"docker", "start", "zokrates_container"};
-                new ProcessBuilder(startExistingCommand).start();
-            } else {
-                // If the Docker container does not exist, create and start it
-                String[] startCommand = {"docker", "run", "-d", "--name", "zokrates_container", "zokrates/zokrates", "tail", "-f", "/dev/null"};
-                new ProcessBuilder(startCommand).start();
-            }
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 
     public boolean verifyProof(byte[] zkpData) {
         // Assuming separateAndCreateFiles function handles file creation and checks
-    
+        
         boolean verified = false;
         try {
-            if (!fileExistsInContainer("zokrates_container", "/home/zokrates/proof.json")) {
+            if (!fileExistsInContainer(this.containerName, "/home/zokrates/proof.json")) {
                 separateAndCreateFiles(zkpData);
                 // Copy both files to the Docker container
-                String[] copyProofCommand = {"docker", "cp", "./proof.json", "zokrates_container:/home/zokrates/"};
-                String[] copyProvingKeyCommand = {"docker", "cp", "./proving.key", "zokrates_container:/home/zokrates/"};
-                String[] copyVerificationKeyCommand = {"docker", "cp", "./verification.key", "zokrates_container:/home/zokrates/"};
+                String[] copyProofCommand = {"docker", "cp", "./proof.json", this.containerName+ ":/home/zokrates/"};
+                String[] copyProvingKeyCommand = {"docker", "cp", "./proving.key", this.containerName+":/home/zokrates/"};
+                String[] copyVerificationKeyCommand = {"docker", "cp", "./verification.key", this.containerName+":/home/zokrates/"};
                 new ProcessBuilder(copyProofCommand).start();
                 new ProcessBuilder(copyProvingKeyCommand).start();
                 new ProcessBuilder(copyVerificationKeyCommand).start();
             }
         
             // Execute verification command in Docker container
-            String[] dockerCommand = {"docker", "exec", "zokrates_container", "/bin/bash", "-c", "zokrates verify"};
+            String[] dockerCommand = {"docker", "exec", this.containerName, "/bin/bash", "-c", "zokrates verify"};
             Process process = new ProcessBuilder(dockerCommand).start();
     
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -79,12 +59,6 @@ public class ZokratesService {
 
     // helper functions
 
-    private boolean dockerContainerExists(String containerName) throws IOException, InterruptedException {
-        String[] checkCommand = {"docker", "ps", "-a", "-q", "--filter", "name=" + containerName};
-        Process checkProcess = new ProcessBuilder(checkCommand).start();
-        BufferedReader checkReader = new BufferedReader(new InputStreamReader(checkProcess.getInputStream()));
-        return checkReader.readLine() != null;
-    }
 
     public void separateAndCreateFiles(byte[] combinedData) throws IOException {
         // Find the indexes of the two delimiters in the combinedData
