@@ -10,7 +10,8 @@ public class ZeroKnowledgeProofsInterfaceInstance {
     public static ZeroKnowledgeProofsInterface getInstance() {
         if (instance != null)
 			return instance;
-        return new ZKSnarksZokratesGroth16();
+		instance = new ZKSnarksZokratesGroth16();
+        return instance;
     }
 
 
@@ -19,11 +20,11 @@ public class ZeroKnowledgeProofsInterfaceInstance {
 			return instance;
 
 		synchronized (ZeroKnowledgeProofsInterface.class) {
-			if (instance != null)
-				return instance;
-
 			switch (zkpType) {
 				case ZKSNARKS_ZOKRATES_GROTH_16:
+					instance = new ZKSnarksZokratesGroth16();
+					break;
+				default:
 					instance = new ZKSnarksZokratesGroth16();
 					break;
 			}
