@@ -9,7 +9,7 @@ privacy_levels = ["Public standard", "Privacy enhanced"]
 # Actual values for latency and throughput means and standard deviations
 latency_data_means = {
     "PoW": [[223.268, 212.916], [47, 18.909]],  # privacy enhanced, public standard
-    "BFT": [[0, 0], [0.933, 0.919]],  # privacy enhanced, public standard
+    "BFT": [[229.193, 253.391], [0.933, 0.919]],  # privacy enhanced, public standard
 }
 
 latency_data_std = {
@@ -24,7 +24,10 @@ latency_data_std = {
         ],
     ],
     "BFT": [
-        [0, 0],
+        [
+            np.std([257.59, 299.42, 217.42, 215.53, 217.06, 217.79, 218.42, 213.14, 213.64, 221.92]),
+            np.std([244.22, 255.17, 271.20, 242.84, 240.75, 260.07, 266.02, 252.62, 247.03, 253.99]),
+        ],
         [
             np.std([0.93, 0.92, 0.95, 0.96, 0.92, 0.92, 0.93, 0.93, 0.94, 0.93]),
             np.std([0.93, 0.91, 0.91, 0.92, 0.91, 0.92, 0.94, 0.92, 0.91, 0.92]),
@@ -34,7 +37,7 @@ latency_data_std = {
 
 throughput_data_means = {
     "PoW": [[6.7, 6.92], [21.75, 38.32]],  # Privacy enhanced, Public standard
-    "BFT": [[0, 0], [49.28, 49.31]],  # Privacy enhanced, Public standard
+    "BFT": [[6.41, 5.66], [49.28, 49.31]],  # Privacy enhanced, Public standard
 }
 
 throughput_data_std = {
@@ -49,7 +52,10 @@ throughput_data_std = {
         ],
     ],
     "BFT": [
-        [0, 0],
+        [
+            np.std([5.6, 5.1, 6.6, 6.7, 6.6, 6.7, 6.6, 6.8, 6.8, 6.6]),
+            np.std([5.8, 5.6, 5.4, 5.8, 5.9, 5.4, 5.4, 5.7, 6.0, 5.6]),
+        ],
         [
             np.std([49.2, 49.3, 49.3, 49.2, 49.2, 49.3, 49.3, 49.4, 49.3, 49.3]),
             np.std([49.3, 49.3, 49.2, 49.3, 49.3, 49.3, 49.4, 49.3, 49.3, 49.4]),
@@ -91,12 +97,12 @@ for i, consensus in enumerate(consensus_mechanisms):
         label="Public standard",
     )
 
-    ax.set_title(f"{consensus} - Latency")
-    ax.set_xlabel("Transaction Type")
-    ax.set_ylabel("Latency (s)")
+    ax.set_xlabel("Transaction Type", fontsize=16)
+    ax.set_ylabel("Latency (s)", fontsize=16)
     ax.set_xticks(index + bar_width / 2)
-    ax.set_xticklabels(transaction_types)
-    ax.legend()
+    ax.set_xticklabels(transaction_types, fontsize=14)
+    ax.set_yticklabels([0, 50, 100, 150, 200, 250], fontsize=14)
+    ax.legend(fontsize=10, loc="upper right")
 
     plt.tight_layout()
     plt.savefig(f"./{consensus}_latency_color_bw.png")
@@ -125,13 +131,13 @@ for i, consensus in enumerate(consensus_mechanisms):
         hatch=hatches[1],
         label="Public standard",
     )
-
-    ax.set_title(f"{consensus} - Throughput")
-    ax.set_xlabel("Transaction Type")
-    ax.set_ylabel("Throughput (tx/sec)")
+    values = [0, 10, 20, 30, 40, 50] if consensus == "BFT" else [0, 5, 10, 15, 20, 25, 30, 35, 40, 45]
+    ax.set_xlabel("Transaction Type", fontsize=16)
+    ax.set_ylabel("Throughput (tx/sec)", fontsize=16)
     ax.set_xticks(index + bar_width / 2)
-    ax.set_xticklabels(transaction_types)
-    ax.legend()
+    ax.set_xticklabels(transaction_types, fontsize=14)
+    ax.set_yticklabels(values, fontsize=14)
+    ax.legend(fontsize=10, loc="upper left")
 
     plt.tight_layout()
     plt.savefig(f"./{consensus}_throughput_color_bw.png")

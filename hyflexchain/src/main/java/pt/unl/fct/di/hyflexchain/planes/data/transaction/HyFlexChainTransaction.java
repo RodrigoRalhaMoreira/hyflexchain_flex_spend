@@ -221,9 +221,22 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 		if (this.zkpType != ZeroKnowledgeProofType.NON_ZK) {
 			return verifyZeroKnowledgeProof();
 		}
+		// Capture the start time
+		long startTime = System.nanoTime();
         var key = this.sender.readPublicKey();
 		var sigAlg = this.signatureType;
-		return verifySignature(key, sigAlg);
+		boolean sig =  verifySignature(key, sigAlg);
+		// Capture the end time
+		long endTime = System.nanoTime();
+	
+		// Calculate the elapsed time in milliseconds
+		long elapsedTime = (endTime - startTime) / 1_000_000;
+		// Get the current timestamp
+		long currentTime = System.currentTimeMillis();
+		
+		// Print the time taken with transaction ID and timestamp
+		System.out.println("Transaction ID: " + this.nonce + ", Timestamp: " + currentTime + ", " + elapsedTime + " ms");
+		return sig;
     }
 
 	public boolean verifySignature(PublicKey key, SignatureAlgorithm sigAlg) throws InvalidKeyException, SignatureException
@@ -237,9 +250,11 @@ public class HyFlexChainTransaction implements BytesOps, HashOps, SignatureOps {
 
 	public boolean verifyZeroKnowledgeProof()
     {	
+
 		// get the zero knowledge proof instance
 		ZeroKnowledgeProofsInterface zkp = ZeroKnowledgeProofsInterface.getInstance(this.zkpType);
 		return zkp.verifyProof(this.zkpProofData);
+
     }
 
 	public Address[] recipientAddresses()
